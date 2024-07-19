@@ -1,5 +1,9 @@
 # TestAccountCore
 
+## 1.2.0
+
+\+ Added Material Variants<br>
+
 ## 1.1.0
 
 \+ Added LINQ Extensions<br>
