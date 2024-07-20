@@ -1,5 +1,9 @@
 # TestAccountCore
 
+## 1.2.1
+
+\* Hopefully fixed Material Variants not syncing<br>
+
 ## 1.2.0
 
 \+ Added Material Variants<br>
