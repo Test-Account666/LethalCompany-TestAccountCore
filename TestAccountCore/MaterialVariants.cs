@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -30,8 +31,9 @@ public class MaterialVariants : NetworkBehaviour {
     [Tooltip("The currently saved material variant.")]
     public int savedMaterialVariant = -1;
 
-    public override void OnNetworkSpawn() =>
-        SetRendererServerRpc();
+    public bool synced;
+
+    public override void OnNetworkSpawn() => StartCoroutine(WaitAndSync());
 
     [ServerRpc(RequireOwnership = false)]
     private void SetRendererServerRpc() {
@@ -44,6 +46,8 @@ public class MaterialVariants : NetworkBehaviour {
 
     [ClientRpc]
     private void SetRendererClientRpc(int materialVariant) {
+        synced = true;
+
         foreach (var renderer in meshRenderers) {
             renderer.material = materialVariants[materialVariant];
 
@@ -51,5 +55,14 @@ public class MaterialVariants : NetworkBehaviour {
 
             scanNodeProperties.headerText = scanNodeText[materialVariant];
         }
+    }
+
+    private IEnumerator WaitAndSync() {
+        yield return new WaitForSeconds(1);
+        SetRendererServerRpc();
+        yield return new WaitForEndOfFrame();
+        if (synced) yield break;
+
+        yield return WaitAndSync();
     }
 }
