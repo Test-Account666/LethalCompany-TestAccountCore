@@ -1,5 +1,5 @@
-using LobbyCompatibility.Enums;
 using LobbyCompatibility.Features;
+using TestAccountCore.Dependencies.Compatibility;
 
 namespace TestAccountCore.Dependencies;
 
@@ -10,5 +10,5 @@ public static class LobbyCompatibilitySupport {
 
     public static void Initialize(string pluginGuid, string pluginVersion, CompatibilityLevel compatibilityLevel,
                                   VersionStrictness versionStrictness) =>
-        PluginHelper.RegisterPlugin(pluginGuid, new(pluginVersion), compatibilityLevel, versionStrictness);
+        PluginHelper.RegisterPlugin(pluginGuid, new(pluginVersion), compatibilityLevel.Convert(), versionStrictness.Convert());
 }

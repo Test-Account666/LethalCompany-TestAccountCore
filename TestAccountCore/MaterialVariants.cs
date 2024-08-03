@@ -58,11 +58,19 @@ public class MaterialVariants : NetworkBehaviour {
     }
 
     private IEnumerator WaitAndSync() {
+        TestAccountCore.Logger.LogDebug("Starting WaitAndSync");
         yield return new WaitForSeconds(1);
+        TestAccountCore.Logger.LogDebug("After wait");
         SetRendererServerRpc();
+        TestAccountCore.Logger.LogDebug("RPC called");
         yield return new WaitForEndOfFrame();
-        if (synced) yield break;
+        TestAccountCore.Logger.LogDebug("End of frame");
+        if (synced) {
+            TestAccountCore.Logger.LogDebug("Already synced, breaking out.");
+            yield break;
+        }
 
+        TestAccountCore.Logger.LogDebug("Not yet synced, retrying...");
         yield return WaitAndSync();
     }
 }

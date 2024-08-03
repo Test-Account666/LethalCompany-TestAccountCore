@@ -1,5 +1,9 @@
 # TestAccountCore
 
+## 1.3.0
+
+\* Fix logic issue with LobbyCompatibility
+
 ## 1.2.1
 
 \* Hopefully fixed Material Variants not syncing<br>
