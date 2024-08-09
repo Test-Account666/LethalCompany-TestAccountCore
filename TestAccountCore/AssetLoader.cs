@@ -95,6 +95,48 @@ public static class AssetLoader {
         TestAccountCore.Logger.LogInfo($"Fully registered item {item.item.itemName}!");
     }
 
+    public static void LoadHazards(ConfigFile? configFile) {
+        if (_assets is null || configFile is null) return;
+
+        var allAssets = _assets.LoadAllAssets<MapHazardWithDefaultWeight>();
+
+        var allHazardsWithDefaultWeight = allAssets.OfType<MapHazardWithDefaultWeight>();
+
+        var hazardsWithDefaultWeight = allHazardsWithDefaultWeight.ToList();
+
+        RegisterAllHazards(hazardsWithDefaultWeight, configFile);
+    }
+
+    private static void RegisterAllHazards(List<MapHazardWithDefaultWeight> hazardsWithDefaultWeight, ConfigFile? configFile) {
+        if (configFile is null) return;
+
+        hazardsWithDefaultWeight.ForEach(hazard => RegisterHazard(hazard, configFile));
+    }
+
+    private static void RegisterHazard(MapHazardWithDefaultWeight hazard, ConfigFile? configFile) {
+        if (configFile is null) return;
+
+        if (hazard.spawnableMapObject is null) throw new NullReferenceException("Map Hazard cannot be null!");
+
+        if (hazard.hazardName is null) throw new NullReferenceException("Map Hazard name cannot be null!");
+
+        var canHazardSpawn = configFile.Bind($"{hazard.hazardName}", "1. Enabled", true,
+                                             $"If false, {hazard.hazardName} will not be registered.");
+
+        if (!canHazardSpawn.Value) return;
+
+        var spawnWeight = configFile.Bind($"{hazard.hazardName}", "2. Spawn Weight", hazard.amount,
+                                          $"The Spawn weight for {hazard.hazardName}.").Value;
+
+        MapObjects.RegisterMapObject(new SpawnableMapObject {
+            prefabToSpawn = hazard.spawnableMapObject,
+        }, Levels.LevelTypes.All, _ => new(new Keyframe(0, 0), new Keyframe(1, spawnWeight)));
+
+        NetworkPrefabs.RegisterNetworkPrefab(hazard.spawnableMapObject);
+
+        TestAccountCore.Logger.LogInfo($"Fully registered hazard {hazard.hazardName}!");
+    }
+
     private static (Dictionary<Levels.LevelTypes, int> spawnRateByLevelType, Dictionary<string, int> spawnRateByCustomLevelType)
         ParseConfig(this string configMoonRarity, string itemName) {
         Dictionary<Levels.LevelTypes, int> spawnRateByLevelType = [

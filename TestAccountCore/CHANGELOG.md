@@ -1,8 +1,12 @@
 # TestAccountCore
 
+## 1.4.0
+
+\+ Added Map Hazard loader<br>
+
 ## 1.3.0
 
-\* Fix logic issue with LobbyCompatibility
+\* Fix logic issue with LobbyCompatibility<br>
 
 ## 1.2.1
 
