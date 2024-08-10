@@ -1,5 +1,9 @@
 # TestAccountCore
 
+## 1.5.0
+
+\+ Added options for hazards<br>
+
 ## 1.4.0
 
 \+ Added Map Hazard loader<br>

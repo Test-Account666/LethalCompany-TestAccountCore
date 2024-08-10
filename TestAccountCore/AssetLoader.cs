@@ -130,6 +130,12 @@ public static class AssetLoader {
 
         MapObjects.RegisterMapObject(new SpawnableMapObject {
             prefabToSpawn = hazard.spawnableMapObject,
+            spawnFacingWall = hazard.spawnFacingWall,
+            spawnWithBackToWall = hazard.spawnWithBackToWall,
+            spawnFacingAwayFromWall = hazard.spawnFacingAwayFromWall,
+            spawnWithBackFlushAgainstWall = hazard.spawnWithBackFlushAgainstWall,
+            disallowSpawningNearEntrances = hazard.disallowSpawningNearEntrances,
+            requireDistanceBetweenSpawns = hazard.requireDistanceBetweenSpawns,
         }, Levels.LevelTypes.All, _ => new(new Keyframe(0, 0), new Keyframe(1, spawnWeight)));
 
         NetworkPrefabs.RegisterNetworkPrefab(hazard.spawnableMapObject);

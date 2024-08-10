@@ -15,7 +15,31 @@ public class MapHazardWithDefaultWeight : ScriptableObject {
     public int amount;
 
     [SerializeField]
-    [Tooltip("The hazard namde.")]
+    [Tooltip("The hazard name.")]
     [Space(10f)]
     public string? hazardName;
+
+    [SerializeField]
+    [Space(10f)]
+    public bool spawnFacingAwayFromWall;
+
+    [SerializeField]
+    [Space(10f)]
+    public bool spawnFacingWall;
+
+    [SerializeField]
+    [Space(10f)]
+    public bool spawnWithBackToWall;
+
+    [SerializeField]
+    [Space(10f)]
+    public bool spawnWithBackFlushAgainstWall;
+
+    [SerializeField]
+    [Space(10f)]
+    public bool requireDistanceBetweenSpawns;
+
+    [SerializeField]
+    [Space(10f)]
+    public bool disallowSpawningNearEntrances;
 }
