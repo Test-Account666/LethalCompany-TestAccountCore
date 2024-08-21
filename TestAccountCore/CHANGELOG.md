@@ -1,5 +1,9 @@
 # TestAccountCore
 
+## 1.6.0
+
+\+ Added ConnectedNetworkPrefab registration<br>
+
 ## 1.5.0
 
 \+ Added options for hazards<br>
