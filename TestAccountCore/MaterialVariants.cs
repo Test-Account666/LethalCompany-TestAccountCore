@@ -37,7 +37,7 @@ public class MaterialVariants : NetworkBehaviour {
 
     [ServerRpc(RequireOwnership = false)]
     private void SetRendererServerRpc() {
-        savedMaterialVariant = savedMaterialVariant is not -1
+        savedMaterialVariant = savedMaterialVariant != -1
             ? Math.Clamp(savedMaterialVariant, 0, materialVariants.Length - 1)
             : Random.Range(0, materialVariants.Length);
 

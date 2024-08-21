@@ -59,12 +59,10 @@ public static class AssetLoader {
     private static void RegisterScrap(ItemWithDefaultWeight item, ConfigFile? configFile) {
         if (configFile is null) return;
 
-        if (item.item is null)
-            throw new NullReferenceException("ItemProperties cannot be null!");
+        if (item.item is null) throw new NullReferenceException("ItemProperties cannot be null!");
 
         var canItemSpawn = configFile.Bind($"{item.item.itemName}", "1. Enabled", true,
-                                           $"If false, {item.item.itemName
-                                           } will not be registered. This is different from a spawn weight of 0!");
+                                           $"If false, {item.item.itemName} will not be registered. This is different from a spawn weight of 0!");
 
         if (!canItemSpawn.Value) return;
 
@@ -88,9 +86,11 @@ public static class AssetLoader {
 
         var parsedConfig = configMoonRarity.Value.ParseConfig(item.item.itemName);
 
-        Items.RegisterScrap(item.item, parsedConfig.spawnRateByLevelType, parsedConfig.spawnRateByCustomLevelType);
+        foreach (var networkPrefab in item.connectedNetworkPrefabs) NetworkPrefabs.RegisterNetworkPrefab(networkPrefab);
 
         NetworkPrefabs.RegisterNetworkPrefab(item.item.spawnPrefab);
+
+        Items.RegisterScrap(item.item, parsedConfig.spawnRateByLevelType, parsedConfig.spawnRateByCustomLevelType);
 
         TestAccountCore.Logger.LogInfo($"Fully registered item {item.item.itemName}!");
     }

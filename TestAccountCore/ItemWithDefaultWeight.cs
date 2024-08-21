@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace TestAccountCore;
@@ -13,4 +14,10 @@ public class ItemWithDefaultWeight : ScriptableObject {
     [Tooltip("The default spawn weight of this item.")]
     [Space(5F)]
     public int defaultWeight;
+
+    [SerializeField]
+    [Tooltip("All network prefabs that are connected to this item.")]
+    [Space(5F)]
+    public List<GameObject> connectedNetworkPrefabs = [
+    ];
 }
