@@ -5,7 +5,7 @@
         <AssemblyName>TestAccount666.TestAccountCore</AssemblyName>
         <Product>TestAccountCore</Product>
         <!-- Change to whatever version you're currently on. -->
-        <Version>1.6.0</Version>
+        <Version>1.7.0</Version>
         <Description>A mod with some common methods I use in my mods</Description>
         <Source>https://github.com/Test-Account666/LethalCompany-TestAccountCore</Source>
     </PropertyGroup>
