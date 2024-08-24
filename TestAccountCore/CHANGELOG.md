@@ -1,5 +1,9 @@
 # TestAccountCore
 
+## 1.7.0
+
+\+ Added CustomScript objects<br>
+
 ## 1.6.0
 
 \+ Added ConnectedNetworkPrefab registration<br>
