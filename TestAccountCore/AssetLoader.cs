@@ -32,9 +32,18 @@ public static class AssetLoader {
         try {
             _assets = AssetBundle.LoadFromFile(assetBundlePath);
         } catch (Exception ex) {
-            TestAccountCore.Logger.LogError($"Failed to load asset bundle '{assetBundleName}' for assembly {assembly.FullName}: {ex.Message
-            }");
+            TestAccountCore.Logger.LogError($"Failed to load asset bundle '{assetBundleName}' for assembly {assembly.FullName}: {ex.Message}");
         }
+    }
+
+    public static void LoadCustomScripts(ConfigFile? configFile) {
+        if (_assets is null || configFile is null) return;
+
+        var allAssets = _assets.LoadAllAssets<CustomScript>();
+        
+        var allCustomScripts = allAssets.OfType<CustomScript>();
+
+        foreach (var customScript in allCustomScripts) customScript.Initialize(configFile);
     }
 
 
