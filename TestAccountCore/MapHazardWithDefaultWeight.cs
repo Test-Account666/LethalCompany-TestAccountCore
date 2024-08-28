@@ -15,6 +15,11 @@ public class MapHazardWithDefaultWeight : ScriptableObject {
     public int amount;
 
     [SerializeField]
+    [Tooltip("The amount to spawn.")]
+    [Space(10f)]
+    public string? spawnCurve;
+
+    [SerializeField]
     [Tooltip("The hazard name.")]
     [Space(10f)]
     public string? hazardName;

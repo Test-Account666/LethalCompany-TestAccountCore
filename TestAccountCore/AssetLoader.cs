@@ -40,7 +40,7 @@ public static class AssetLoader {
         if (_assets is null || configFile is null) return;
 
         var allAssets = _assets.LoadAllAssets<CustomScript>();
-        
+
         var allCustomScripts = allAssets.OfType<CustomScript>();
 
         foreach (var customScript in allCustomScripts) customScript.Initialize(configFile);
@@ -134,8 +134,35 @@ public static class AssetLoader {
 
         if (!canHazardSpawn.Value) return;
 
-        var spawnWeight = configFile.Bind($"{hazard.hazardName}", "2. Spawn Weight", hazard.amount,
-                                          $"The Spawn weight for {hazard.hazardName}.").Value;
+        AnimationCurve animationCurve;
+
+        if (string.IsNullOrWhiteSpace(hazard.spawnCurve)) {
+            var spawnMaxAmount = configFile.Bind($"{hazard.hazardName}", "2. Max Spawn Amount", hazard.amount,
+                                                 $"The max spawn amount for {hazard.hazardName}.").Value;
+
+            animationCurve = new(new Keyframe(0, 0), new Keyframe(1, spawnMaxAmount));
+        } else {
+            var defaultCurve = hazard.spawnCurve;
+
+            var spawnCurveString = configFile.Bind($"{hazard.hazardName}", "2. Spawn Curve", defaultCurve,
+                                                   $"The spawn curve for {hazard.hazardName}. "
+                                                 + $"First number is between 0 and 1. The second one is the max amount.").Value;
+
+            var keyFrames = new List<Keyframe>();
+
+            foreach (var keyframeString in spawnCurveString.Split(",")) {
+                var keyframe = keyframeString.Split(':');
+
+                if (keyframe.Length <= 1) throw new InvalidDataException("Map Hazard spawn curve is not correctly configured!");
+
+                var time = float.Parse(keyframe[0]);
+                var amount = int.Parse(keyframe[1]);
+
+                keyFrames.Add(new(time, amount));
+            }
+
+            animationCurve = new(keyFrames.ToArray());
+        }
 
         MapObjects.RegisterMapObject(new SpawnableMapObject {
             prefabToSpawn = hazard.spawnableMapObject,
@@ -145,7 +172,7 @@ public static class AssetLoader {
             spawnWithBackFlushAgainstWall = hazard.spawnWithBackFlushAgainstWall,
             disallowSpawningNearEntrances = hazard.disallowSpawningNearEntrances,
             requireDistanceBetweenSpawns = hazard.requireDistanceBetweenSpawns,
-        }, Levels.LevelTypes.All, _ => new(new Keyframe(0, 0), new Keyframe(1, spawnWeight)));
+        }, Levels.LevelTypes.All, _ => animationCurve);
 
         NetworkPrefabs.RegisterNetworkPrefab(hazard.spawnableMapObject);
 
