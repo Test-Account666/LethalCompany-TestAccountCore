@@ -1,5 +1,9 @@
 # TestAccountCore
 
+## 1.8.0
+
+\+ Added Spawn Curve Configuration for Map Hazards<br>
+
 ## 1.7.0
 
 \+ Added CustomScript objects<br>
