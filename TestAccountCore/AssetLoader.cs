@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using BepInEx.Configuration;
 using LethalLib.Modules;
+using MonoMod.Utils;
 using UnityEngine;
 
 namespace TestAccountCore;
@@ -125,9 +126,12 @@ public static class AssetLoader {
     private static void RegisterHazard(MapHazardWithDefaultWeight hazard, ConfigFile? configFile) {
         if (configFile is null) return;
 
-        if (hazard.spawnableMapObject is null) throw new NullReferenceException("Map Hazard cannot be null!");
-
         if (hazard.hazardName is null) throw new NullReferenceException("Map Hazard name cannot be null!");
+
+        TestAccountCore.Logger.LogInfo($"Registering hazard {hazard.hazardName}...");
+
+        if (hazard.spawnableMapObject is null) throw new NullReferenceException($"({hazard.hazardName}) Map Hazard cannot be null!");
+
 
         var canHazardSpawn = configFile.Bind($"{hazard.hazardName}", "1. Enabled", true,
                                              $"If false, {hazard.hazardName} will not be registered.");
@@ -148,12 +152,26 @@ public static class AssetLoader {
                                                    $"The spawn curve for {hazard.hazardName}. "
                                                  + $"First number is between 0 and 1. The second one is the max amount.").Value;
 
+            spawnCurveString = spawnCurveString.Replace(" ", "");
+
+            if (spawnCurveString.StartsWith(",")) spawnCurveString = spawnCurveString[1..];
+
+            if (spawnCurveString.EndsWith(",")) spawnCurveString = spawnCurveString[..^1];
+
             var keyFrames = new List<Keyframe>();
 
             foreach (var keyframeString in spawnCurveString.Split(",")) {
                 var keyframe = keyframeString.Split(':');
 
-                if (keyframe.Length <= 1) throw new InvalidDataException("Map Hazard spawn curve is not correctly configured!");
+                if (keyframe.Length <= 1)
+                    try {
+                        throw new InvalidDataException($"'{spawnCurveString}' is invalid! Point: {keyframeString}");
+                    } catch (Exception exception) {
+                        TestAccountCore.Logger.LogError($"Map Hazard spawn curve is not correctly configured: {exception.Message}");
+
+                        exception.LogDetailed();
+                        return;
+                    }
 
                 var time = float.Parse(keyframe[0]);
                 var amount = int.Parse(keyframe[1]);
