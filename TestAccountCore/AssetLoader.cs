@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -173,8 +174,34 @@ public static class AssetLoader {
                         return;
                     }
 
-                var time = float.Parse(keyframe[0]);
-                var amount = int.Parse(keyframe[1]);
+                var parsedTime = float.TryParse(keyframe[0], NumberStyles.Float, CultureInfo.InvariantCulture, out var time);
+
+                if (!parsedTime) {
+                    try {
+                        throw new InvalidDataException($"'{spawnCurveString}' is invalid!"
+                                                     + $" Point: {keyframeString} (Could not parse time '{keyframe[0]}' as float)");
+                    } catch (Exception exception) {
+                        TestAccountCore.Logger.LogError($"Map Hazard spawn curve is not correctly configured: {exception.Message}");
+
+                        exception.LogDetailed();
+                        return;
+                    }
+                }
+
+                var parsedAmount = int.TryParse(keyframe[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var amount);
+
+                if (!parsedAmount) {
+                    try {
+                        throw new InvalidDataException($"'{spawnCurveString}' is invalid!"
+                                                     + $" Point: {keyframeString} (Could not parse amount '{keyframe[1]}' as int)");
+                    } catch (Exception exception) {
+                        TestAccountCore.Logger.LogError($"Map Hazard spawn curve is not correctly configured: {exception.Message}");
+
+                        exception.LogDetailed();
+                        return;
+                    }
+                }
+
 
                 keyFrames.Add(new(time, amount));
             }
