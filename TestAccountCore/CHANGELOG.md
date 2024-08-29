@@ -1,5 +1,9 @@
 # TestAccountCore
 
+## 1.8.1
+
+\# Now gives more information to why and what hazard couldn't be loaded<br>
+
 ## 1.8.0
 
 \+ Added Spawn Curve Configuration for Map Hazards<br>
