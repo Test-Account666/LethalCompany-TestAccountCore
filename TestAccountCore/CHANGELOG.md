@@ -1,5 +1,9 @@
 # TestAccountCore
 
+## 1.8.2
+
+\* Hopefully fixed parsing numbers on some systems<br>
+
 ## 1.8.1
 
 \# Now gives more information to why and what hazard couldn't be loaded<br>
