@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using BepInEx.Configuration;
+using LethalLib.Extras;
 using LethalLib.Modules;
 using MonoMod.Utils;
 using UnityEngine;
@@ -253,5 +254,72 @@ public static class AssetLoader {
         }
 
         return (spawnRateByLevelType, spawnRateByCustomLevelType);
+    }
+
+    public static void LoadUnlockables(ConfigFile? configFile) {
+        if (_assets is null || configFile is null) return;
+
+        var allAssets = _assets.LoadAllAssets<UnlockableWithPrice>();
+
+        var allHazardsWithDefaultWeight = allAssets.OfType<UnlockableWithPrice>();
+
+        var unlockablesWithPrice = allHazardsWithDefaultWeight.ToList();
+
+        RegisterAllUnlockables(unlockablesWithPrice, configFile);
+    }
+
+    private static void RegisterAllUnlockables(List<UnlockableWithPrice> unlockablesWithPrice, ConfigFile? configFile) {
+        if (configFile is null) return;
+
+        unlockablesWithPrice.ForEach(unlockable => RegisterUnlockable(unlockable, configFile));
+    }
+
+    private static void RegisterUnlockable(UnlockableWithPrice unlockable, ConfigFile? configFile) {
+        if (configFile is null) return;
+
+        if (unlockable.unlockableName is null) throw new NullReferenceException("Unlockable unlockableName cannot be null!");
+
+        TestAccountCore.Logger.LogInfo($"Registering unlockable {unlockable.unlockableName}...");
+
+        if (unlockable.spawnPrefab is null) throw new NullReferenceException($"({unlockable.unlockableName}) Spawn Prefab cannot be null!");
+
+
+        var unlockableEnabled = configFile.Bind($"{unlockable.unlockableName}", "1. Enabled", true,
+                                                $"If false, {unlockable.unlockableName} will not be registered.");
+
+        if (!unlockableEnabled.Value) return;
+
+        var alwaysUnlocked = configFile.Bind($"{unlockable.unlockableName}", "2. Always unlocked", false,
+                                             $"If true, {unlockable.unlockableName} will always be unlocked. Otherwise you need to unlock it.");
+
+        var price = configFile.Bind($"{unlockable.unlockableName}", "3. Price", unlockable.price,
+                                    new ConfigDescription(
+                                        $"Price to unlock {unlockable.unlockableName}. Obviously doesn't matter, if 'Always Unlocked' is true.",
+                                        new AcceptableValueRange<int>(0, 100000)));
+
+        if (ScriptableObject.CreateInstance(typeof(UnlockableItemDef)) is not UnlockableItemDef unlockableDef)
+            throw new NullReferenceException($"({unlockable.unlockableName}) Could not create unlockable item!");
+
+        unlockableDef.storeType = unlockable.storeType;
+
+        unlockableDef.unlockable = new() {
+            unlockableName = unlockable.unlockableName,
+            alreadyUnlocked = alwaysUnlocked.Value,
+            inStorage = false,
+            alwaysInStock = true,
+            hasBeenMoved = true,
+            canBeStored = true,
+            maxNumber = 1,
+            unlockableType = 1,
+            hasBeenUnlockedByPlayer = alwaysUnlocked.Value,
+            spawnPrefab = true,
+            prefabObject = unlockable.spawnPrefab,
+        };
+
+        Unlockables.RegisterUnlockable(unlockableDef, price.Value, unlockable.storeType);
+
+        NetworkPrefabs.RegisterNetworkPrefab(unlockable.spawnPrefab);
+
+        TestAccountCore.Logger.LogInfo($"Fully registered unlockable {unlockable.unlockableName}!");
     }
 }
