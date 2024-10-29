@@ -1,5 +1,9 @@
 # TestAccountCore
 
+## 1.9.1
+
+\* Fix unlockables unlocking themselves<br>
+
 ## 1.9.0
 
 \+ Added system for unlockables<br>
