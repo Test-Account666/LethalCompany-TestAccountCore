@@ -307,7 +307,6 @@ public static class AssetLoader {
             alreadyUnlocked = alwaysUnlocked.Value,
             inStorage = false,
             alwaysInStock = true,
-            hasBeenMoved = true,
             canBeStored = true,
             maxNumber = 1,
             unlockableType = 1,
