@@ -321,4 +321,48 @@ public static class AssetLoader {
 
         TestAccountCore.Logger.LogInfo($"Fully registered unlockable {unlockable.unlockableName}!");
     }
+
+    public static void LoadShopItems(ConfigFile? configFile) {
+        if (_assets is null || configFile is null) return;
+
+        var allAssets = _assets.LoadAllAssets<ShopItemWithDefaultPrice>();
+
+        var allItemsWithPrice = allAssets.OfType<ShopItemWithDefaultPrice>();
+
+        var itemsWithDefaultPrice = allItemsWithPrice.ToList();
+
+        RegisterAllShopItems(itemsWithDefaultPrice, configFile);
+    }
+
+    public static void RegisterAllShopItems(List<ShopItemWithDefaultPrice> itemsWithDefaultPrice, ConfigFile? configFile) {
+        if (configFile is null) return;
+
+        itemsWithDefaultPrice.ForEach(item => RegisterShopItem(item, configFile));
+    }
+
+    private static void RegisterShopItem(ShopItemWithDefaultPrice item, ConfigFile? configFile) {
+        if (configFile is null) return;
+
+        if (item.item is null) throw new NullReferenceException("ItemProperties cannot be null!");
+
+        var canItemSpawn = configFile.Bind($"{item.item.itemName}", "1. Enabled", true,
+                                           $"If false, {item.item.itemName} will not be registered. This is different from a spawn weight of 0!");
+
+        if (!canItemSpawn.Value) return;
+
+        var price = configFile.Bind($"{item.item.itemName}", "2. Price", item.defaultPrice, $"How much {item.item.itemName} costs to buy!");
+
+        var itemConductivity = configFile.Bind($"{item.item.itemName}", "3. Is Conductive", item.item.isConductiveMetal,
+                                               "If set to true, will make the item conductive. Conductive defines, if the item attracts lightning");
+
+        item.item.isConductiveMetal = itemConductivity.Value;
+
+        foreach (var networkPrefab in item.connectedNetworkPrefabs) NetworkPrefabs.RegisterNetworkPrefab(networkPrefab);
+
+        NetworkPrefabs.RegisterNetworkPrefab(item.item.spawnPrefab);
+
+        Items.RegisterShopItem(item.item, price.Value);
+
+        TestAccountCore.Logger.LogInfo($"Fully registered shop item {item.item.itemName}!");
+    }
 }
