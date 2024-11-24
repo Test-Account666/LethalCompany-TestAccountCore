@@ -1,5 +1,9 @@
 # TestAccountCore
 
+## 1.10.0
+
+\+ Added system for shop items<br>
+
 ## 1.9.1
 
 \* Fix unlockables unlocking themselves<br>
