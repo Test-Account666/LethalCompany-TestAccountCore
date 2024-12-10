@@ -1,5 +1,10 @@
 # TestAccountCore
 
+## 1.11.0
+
+\+ Added ability to configure map hazard spawn curve per moon<br>
+\# A lot of internal changes. Split all loading logic into separate classes, for example<br>
+
 ## 1.10.0
 
 \+ Added system for shop items<br>
