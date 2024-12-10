@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace TestAccountCore;
@@ -12,6 +13,7 @@ public class MapHazardWithDefaultWeight : ScriptableObject {
     [SerializeField]
     [Tooltip("The amount to spawn.")]
     [Space(10f)]
+    [Obsolete]
     public int amount;
 
     [SerializeField]
