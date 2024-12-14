@@ -21,7 +21,14 @@ public class UnlockableWithPrice : ScriptableObject {
     public int price;
 
     [SerializeField]
+    [Tooltip("The luck value for this unlockable.")]
+    [Space(10f)]
+    public float luckValue;
+
+    [SerializeField]
     [Tooltip("The unlockable prefab.")]
     [Space(10f)]
     public GameObject? spawnPrefab;
+
+    public bool isRegistered;
 }

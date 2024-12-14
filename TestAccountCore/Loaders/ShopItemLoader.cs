@@ -37,6 +37,8 @@ public static class ShopItemLoader {
 
         Items.RegisterShopItem(item.item, price.Value);
 
+        item.isRegistered = true;
+
         TestAccountCore.Logger.LogInfo($"Fully registered shop item {item.item.itemName}!");
     }
 }

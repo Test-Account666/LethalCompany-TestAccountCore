@@ -102,6 +102,8 @@ public static class HazardLoader {
 
         NetworkPrefabs.RegisterNetworkPrefab(hazard.spawnableMapObject);
 
+        hazard.isRegistered = true;
+
         TestAccountCore.Logger.LogInfo($"Fully registered hazard {hazard.hazardName}!");
     }
 

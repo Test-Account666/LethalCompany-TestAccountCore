@@ -49,4 +49,6 @@ public class MapHazardWithDefaultWeight : ScriptableObject {
     [SerializeField]
     [Space(10f)]
     public bool disallowSpawningNearEntrances;
+
+    public bool isRegistered;
 }

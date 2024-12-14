@@ -53,11 +53,14 @@ public static class UnlockableLoader {
             hasBeenUnlockedByPlayer = alwaysUnlocked.Value,
             spawnPrefab = true,
             prefabObject = unlockable.spawnPrefab,
+            luckValue = unlockable.luckValue,
         };
 
         Unlockables.RegisterUnlockable(unlockableDef, price.Value, unlockable.storeType);
 
         NetworkPrefabs.RegisterNetworkPrefab(unlockable.spawnPrefab);
+
+        unlockable.isRegistered = true;
 
         TestAccountCore.Logger.LogInfo($"Fully registered unlockable {unlockable.unlockableName}!");
     }

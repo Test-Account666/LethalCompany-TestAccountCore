@@ -20,4 +20,6 @@ public class ShopItemWithDefaultPrice : ScriptableObject {
     [Space(5F)]
     public List<GameObject> connectedNetworkPrefabs = [
     ];
+
+    public bool isRegistered;
 }

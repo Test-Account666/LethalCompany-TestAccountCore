@@ -50,6 +50,8 @@ public static class ScrapLoader {
 
         Items.RegisterScrap(item.item, parsedConfig.spawnRateByLevelType, parsedConfig.spawnRateByCustomLevelType);
 
+        item.isRegistered = true;
+        
         TestAccountCore.Logger.LogInfo($"Fully registered item {item.item.itemName}!");
     }
 
