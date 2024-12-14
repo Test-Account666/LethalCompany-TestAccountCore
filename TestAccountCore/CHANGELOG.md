@@ -1,5 +1,9 @@
 # TestAccountCore
 
+## 1.12.0
+
+\+ Added a bool to reflect on the registered state of stuff<br>
+
 ## 1.11.0
 
 \+ Added ability to configure map hazard spawn curve per moon<br>
