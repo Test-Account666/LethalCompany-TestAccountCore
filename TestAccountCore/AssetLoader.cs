@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -45,7 +46,14 @@ public static class AssetLoader {
 
 
     public static void LoadItems(ConfigFile? configFile) {
-        if (_assets is null || configFile is null) return;
+        LoadItemsAndReturn(configFile);
+    }
+
+    // ReSharper disable once UnusedMethodReturnValue.Global
+    public static List<ItemWithDefaultWeight> LoadItemsAndReturn(ConfigFile? configFile) {
+        if (_assets is null || configFile is null)
+            return [
+            ];
 
         var allAssets = _assets.LoadAllAssets<ItemWithDefaultWeight>();
 
@@ -54,11 +62,20 @@ public static class AssetLoader {
         var itemsWithDefaultWeight = allItemsWithDefaultWeight.ToList();
 
         ScrapLoader.RegisterAllScrap(itemsWithDefaultWeight, configFile);
+
+        return itemsWithDefaultWeight;
     }
 
 
     public static void LoadHazards(ConfigFile? configFile) {
-        if (_assets is null || configFile is null) return;
+        LoadHazardsAndReturn(configFile);
+    }
+
+    // ReSharper disable once UnusedMethodReturnValue.Global
+    public static List<MapHazardWithDefaultWeight> LoadHazardsAndReturn(ConfigFile? configFile) {
+        if (_assets is null || configFile is null)
+            return [
+            ];
 
         var allAssets = _assets.LoadAllAssets<MapHazardWithDefaultWeight>();
 
@@ -67,10 +84,19 @@ public static class AssetLoader {
         var hazardsWithDefaultWeight = allHazardsWithDefaultWeight.ToList();
 
         HazardLoader.RegisterAllHazards(hazardsWithDefaultWeight, configFile);
+
+        return hazardsWithDefaultWeight;
     }
 
     public static void LoadUnlockables(ConfigFile? configFile) {
-        if (_assets is null || configFile is null) return;
+        LoadUnlockablesAndReturn(configFile);
+    }
+
+    // ReSharper disable once UnusedMethodReturnValue.Global
+    public static List<UnlockableWithPrice> LoadUnlockablesAndReturn(ConfigFile? configFile) {
+        if (_assets is null || configFile is null)
+            return [
+            ];
 
         var allAssets = _assets.LoadAllAssets<UnlockableWithPrice>();
 
@@ -79,10 +105,19 @@ public static class AssetLoader {
         var unlockablesWithPrice = allHazardsWithDefaultWeight.ToList();
 
         UnlockableLoader.RegisterAllUnlockables(unlockablesWithPrice, configFile);
+
+        return unlockablesWithPrice;
     }
 
     public static void LoadShopItems(ConfigFile? configFile) {
-        if (_assets is null || configFile is null) return;
+        LoadShopItemsAndReturn(configFile);
+    }
+
+    // ReSharper disable once UnusedMethodReturnValue.Global
+    public static List<ShopItemWithDefaultPrice> LoadShopItemsAndReturn(ConfigFile? configFile) {
+        if (_assets is null || configFile is null)
+            return [
+            ];
 
         var allAssets = _assets.LoadAllAssets<ShopItemWithDefaultPrice>();
 
@@ -91,5 +126,28 @@ public static class AssetLoader {
         var itemsWithDefaultPrice = allItemsWithPrice.ToList();
 
         ShopItemLoader.RegisterAllShopItems(itemsWithDefaultPrice, configFile);
+
+        return itemsWithDefaultPrice;
+    }
+
+    public static void LoadEnemies(ConfigFile? configFile) {
+        LoadEnemiesAndReturn(configFile);
+    }
+
+    // ReSharper disable once UnusedMethodReturnValue.Global
+    public static List<EnemyWithDefaultWeight> LoadEnemiesAndReturn(ConfigFile? configFile) {
+        if (_assets is null || configFile is null)
+            return [
+            ];
+
+        var allAssets = _assets.LoadAllAssets<EnemyWithDefaultWeight>();
+
+        var allEnemiesWithWeight = allAssets.OfType<EnemyWithDefaultWeight>();
+
+        var enemiesWithWeight = allEnemiesWithWeight.ToList();
+
+        EnemyLoader.RegisterAllEnemies(enemiesWithWeight, configFile);
+
+        return enemiesWithWeight;
     }
 }
