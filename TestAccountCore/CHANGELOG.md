@@ -1,5 +1,9 @@
 # TestAccountCore
 
+## 1.13.1
+
+\* Fixed typo in enemy configs<br>
+
 ## 1.13.0
 
 \+ Added enemy loading<br>
