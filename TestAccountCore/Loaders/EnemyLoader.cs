@@ -25,7 +25,7 @@ public static class EnemyLoader {
 
         TestAccountCore.Logger.LogInfo($"Registering enemy {enemy.enemyType.enemyName}...");
 
-        var configMoonRarity = configFile.Bind($"{enemy.enemyType.enemyName}", "4. Moon Spawn Weight",
+        var configMoonRarity = configFile.Bind($"{enemy.enemyType.enemyName}", "2. Moon Spawn Weight",
                                                $"Vanilla:{enemy.defaultWeight}, Modded:{enemy.defaultWeight}",
                                                $"Defines the spawn weight per moon. e.g. Assurance:{enemy.defaultWeight}");
 
