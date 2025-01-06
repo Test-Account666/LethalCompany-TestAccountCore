@@ -150,4 +150,6 @@ public static class AssetLoader {
 
         return enemiesWithWeight;
     }
+
+    public static void UnloadBundle(bool unloadAllLoadedObjects = false) => _assets?.Unload(unloadAllLoadedObjects);
 }
