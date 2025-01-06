@@ -33,9 +33,8 @@ public static class UnlockableLoader {
                                              $"If true, {unlockable.unlockableName} will always be unlocked. Otherwise you need to unlock it.");
 
         var price = configFile.Bind($"{unlockable.unlockableName}", "3. Price", unlockable.price,
-                                    new ConfigDescription(
-                                        $"Price to unlock {unlockable.unlockableName}. Obviously doesn't matter, if 'Always Unlocked' is true.",
-                                        new AcceptableValueRange<int>(0, 100000)));
+                                    new ConfigDescription($"Price to unlock {unlockable.unlockableName}. Obviously doesn't matter, if 'Always Unlocked' is true.",
+                                                          new AcceptableValueRange<int>(0, 100000)));
 
         if (ScriptableObject.CreateInstance(typeof(UnlockableItemDef)) is not UnlockableItemDef unlockableDef)
             throw new NullReferenceException($"({unlockable.unlockableName}) Could not create unlockable item!");
@@ -48,6 +47,7 @@ public static class UnlockableLoader {
             inStorage = false,
             alwaysInStock = true,
             canBeStored = true,
+            IsPlaceable = true,
             maxNumber = 1,
             unlockableType = 1,
             hasBeenUnlockedByPlayer = alwaysUnlocked.Value,
