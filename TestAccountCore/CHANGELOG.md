@@ -1,5 +1,10 @@
 # TestAccountCore
 
+## 1.14.0
+
+\+ Added `UnloadBundle` method<br>
+\* Fixed unlockables forgetting their position on re-host<br>
+
 ## 1.13.1
 
 \* Fixed typo in enemy configs<br>
