@@ -1,8 +1,12 @@
 # TestAccountCore
 
+## 1.14.2
+
+\* Fixed `alwaysUnlocked` Unlockables spawning outside the ship<br>
+
 ## 1.14.1
 
-\* Fixed `alwaysUnlcoked` Unlockables never spawning<br>
+\* Fixed `alwaysUnlocked` Unlockables never spawning<br>
 
 ## 1.14.0
 
