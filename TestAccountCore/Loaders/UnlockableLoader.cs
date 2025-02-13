@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using BepInEx.Configuration;
 using LethalLib.Extras;
 using LethalLib.Modules;
+using TestAccountCore.Patches;
 using UnityEngine;
 
 namespace TestAccountCore.Loaders;
@@ -43,18 +44,19 @@ public static class UnlockableLoader {
 
         unlockableDef.unlockable = new() {
             unlockableName = unlockable.unlockableName,
-            alreadyUnlocked = alwaysUnlocked.Value,
+            hasBeenMoved = true,
             inStorage = false,
             alwaysInStock = true,
             canBeStored = true,
             IsPlaceable = true,
             maxNumber = 1,
             unlockableType = 1,
-            hasBeenUnlockedByPlayer = alwaysUnlocked.Value,
             spawnPrefab = true,
             prefabObject = unlockable.spawnPrefab,
             luckValue = unlockable.luckValue,
         };
+
+        if (alwaysUnlocked.Value) SpawnPeskyUnlockablesPatch.AlwaysUnlockedItems.Add(unlockableDef.unlockable);
 
         Unlockables.RegisterUnlockable(unlockableDef, price.Value, unlockable.storeType);
 

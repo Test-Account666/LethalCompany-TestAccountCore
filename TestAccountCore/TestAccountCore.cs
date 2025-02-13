@@ -2,6 +2,7 @@ using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
 using TestAccountCore.Dependencies;
+using TestAccountCore.Patches;
 
 namespace TestAccountCore;
 
@@ -17,6 +18,7 @@ public class TestAccountCore : BaseUnityPlugin {
         harmony ??= new(MyPluginInfo.PLUGIN_GUID);
 
         harmony.PatchAll(typeof(MapHazardRegistry));
+        harmony.PatchAll(typeof(SpawnPeskyUnlockablesPatch));
 
         if (DependencyChecker.IsLobbyCompatibilityInstalled()) {
             Logger.LogInfo("Found LobbyCompatibility Mod, initializing support :)");
