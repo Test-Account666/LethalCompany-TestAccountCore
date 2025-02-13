@@ -44,7 +44,6 @@ public static class UnlockableLoader {
 
         unlockableDef.unlockable = new() {
             unlockableName = unlockable.unlockableName,
-            hasBeenMoved = true,
             inStorage = false,
             alwaysInStock = true,
             canBeStored = true,
