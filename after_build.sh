@@ -7,4 +7,4 @@ cp -f "$CURRENT_PROJECT"/icon.png BuildOutput/ &&
 cp -f LICENSE BuildOutput/ &&
 ./generate_manifest.sh &&
 ./generate_zipfile.sh &&
-dolphin "./BuildOutput"
+xdg-open "./BuildOutput"

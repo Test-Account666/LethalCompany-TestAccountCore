@@ -1,5 +1,13 @@
 # TestAccountCore
 
+## 1.14.4
+
+\* Fixed TypeLoadExceptions in some cases<br>
+
+## 1.14.3
+
+\* Hopefully fixed any v70 issues<br>
+
 ## 1.14.2
 
 \* Fixed `alwaysUnlocked` Unlockables spawning outside the ship<br>

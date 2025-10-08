@@ -5,7 +5,7 @@
         <AssemblyName>TestAccount666.TestAccountCore</AssemblyName>
         <Product>TestAccountCore</Product>
         <!-- Change to whatever version you're currently on. -->
-        <Version>1.14.2</Version>
+        <Version>1.14.4</Version>
         <Description>A mod with some common methods I use in my mods</Description>
         <Source>https://github.com/Test-Account666/LethalCompany-TestAccountCore</Source>
     </PropertyGroup>
@@ -53,9 +53,9 @@
         <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.2" PrivateAssets="all"/>
         <PackageReference Include="BepInEx.Core" Version="5.4.21" PrivateAssets="all"/>
         <PackageReference Include="BepInEx.PluginInfoProps" Version="2.1.0" PrivateAssets="all"/>
-        <PackageReference Include="Evaisa.LethalLib" Version="1.1.0" />
-        <PackageReference Include="LethalCompany.GameLibs.Steam" Version="70.0.0-ngd.0" Publicize="true" PrivateAssets="all" />
-        <PackageReference Include="UnityEngine.Modules" Version="2022.3.9" IncludeAssets="compile" PrivateAssets="all"/>
+        <PackageReference Include="Evaisa.LethalLib" Version="1.1.1" />
+        <PackageReference Include="LethalCompany.GameLibs.Steam" Version="73.0.0-ngd.0" Publicize="true" PrivateAssets="all" />
+        <PackageReference Include="UnityEngine.Modules" Version="2022.3.62" IncludeAssets="compile" PrivateAssets="all"/>
         <PackageReference Include="TeamBMX.LobbyCompatibility" Version="1.5.1" PrivateAssets="all" />
     </ItemGroup>
 
