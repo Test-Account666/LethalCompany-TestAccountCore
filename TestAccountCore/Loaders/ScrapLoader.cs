@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using BepInEx.Configuration;
 using LethalLib.Modules;
 
@@ -19,26 +18,27 @@ public static class ScrapLoader {
         if (item.item is null) throw new NullReferenceException("ItemProperties cannot be null!");
 
         var canItemSpawn = configFile.Bind($"{item.item.itemName}", "1. Enabled", true,
-                                           $"If false, {item.item.itemName} will not be registered. This is different from a spawn weight of 0!");
+            $"If false, {item.item.itemName} will not be registered. This is different from a spawn weight of 0!");
 
         if (!canItemSpawn.Value) return;
 
         TestAccountCore.Logger.LogInfo($"Registering item {item.item.itemName}...");
 
         var maxValue = configFile.Bind($"{item.item.itemName}", "2. Maximum Value", item.item.maxValue,
-                                       $"Defines the maximum scrap value for {item.item.itemName}.");
+            $"Defines the maximum scrap value for {item.item.itemName}.");
 
         var minValue = configFile.Bind($"{item.item.itemName}", "3. Minimum Value", item.item.minValue,
-                                       $"Defines the minimum scrap value for {item.item.itemName}.");
+            $"Defines the minimum scrap value for {item.item.itemName}.");
 
-        var configMoonRarity = configFile.Bind($"{item.item.itemName}", "4. Moon Spawn Weight", $"Vanilla:{item.defaultWeight}, Modded:{item.defaultWeight}",
-                                               $"Defines the spawn weight per moon. e.g. Assurance:{item.defaultWeight}");
+        var configMoonRarity = configFile.Bind($"{item.item.itemName}", "4. Moon Spawn Weight",
+            $"Vanilla:{item.defaultWeight}, Modded:{item.defaultWeight}",
+            $"Defines the spawn weight per moon. e.g. Assurance:{item.defaultWeight}");
 
         item.item.maxValue = maxValue.Value;
         item.item.minValue = minValue.Value;
 
         var itemConductivity = configFile.Bind($"{item.item.itemName}", "5. Is Conductive", item.item.isConductiveMetal,
-                                               "If set to true, will make the item conductive. Conductive defines, if the item attracts lightning");
+            "If set to true, will make the item conductive. Conductive defines, if the item attracts lightning");
 
         item.item.isConductiveMetal = itemConductivity.Value;
 
@@ -49,6 +49,8 @@ public static class ScrapLoader {
         NetworkPrefabs.RegisterNetworkPrefab(item.item.spawnPrefab);
 
         Items.RegisterScrap(item.item, parsedConfig.spawnRateByLevelType, parsedConfig.spawnRateByCustomLevelType);
+
+        foreach (var alternativeItem in item.alternativeItems) Items.RegisterScrap(alternativeItem, [], []);
 
         item.isRegistered = true;
 

@@ -18,8 +18,12 @@ public class ItemWithDefaultWeight : ScriptableObject {
     [SerializeField]
     [Tooltip("All network prefabs that are connected to this item.")]
     [Space(5F)]
-    public List<GameObject> connectedNetworkPrefabs = [
-    ];
+    public List<GameObject> connectedNetworkPrefabs = [];
+
+    [SerializeField]
+    [Tooltip("Alternative item properties, which are registered without any spawn weight.")]
+    [Space(10f)]
+    public List<Item> alternativeItems = [];
 
     public bool isRegistered;
 }

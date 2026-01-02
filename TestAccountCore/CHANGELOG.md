@@ -1,5 +1,10 @@
 # TestAccountCore
 
+## 1.15.0
+
+\+ Added hallway hazards loading<br>
+\* Fixed `alwaysUnlocked` Unlockables not being unlocked properly<br>
+
 ## 1.14.4
 
 \* Fixed TypeLoadExceptions in some cases<br>

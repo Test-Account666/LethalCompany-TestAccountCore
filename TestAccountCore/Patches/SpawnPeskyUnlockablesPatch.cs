@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using HarmonyLib;
 
 namespace TestAccountCore.Patches;
@@ -27,6 +26,8 @@ public static class SpawnPeskyUnlockablesPatch {
             if (!AlwaysUnlockedItems.Contains(unlockable) || _SpawnedUnlockables.Contains(index)) continue;
 
             StartOfRound.Instance.SpawnUnlockable(index);
+            unlockable.hasBeenUnlockedByPlayer = true;
+            unlockable.alreadyUnlocked = true;
         }
     }
 

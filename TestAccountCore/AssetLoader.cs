@@ -22,15 +22,17 @@ public static class AssetLoader {
 
         var assetBundlePath = Path.Combine(assemblyLocation, assetBundleName);
         if (!File.Exists(assetBundlePath)) {
-            TestAccountCore.Logger.LogFatal(new StringBuilder($"Asset bundle '{assetBundleName}' not found at {assetBundlePath}.").Append(" ")
-                                                .Append("Check if the asset bundle is in the same directory as the plugin.").ToString());
+            TestAccountCore.Logger.LogFatal(new StringBuilder($"Asset bundle '{assetBundleName}' not found at {assetBundlePath}.")
+                                            .Append(" ")
+                                            .Append("Check if the asset bundle is in the same directory as the plugin.").ToString());
             return;
         }
 
         try {
             _assets = AssetBundle.LoadFromFile(assetBundlePath);
         } catch (Exception ex) {
-            TestAccountCore.Logger.LogError($"Failed to load asset bundle '{assetBundleName}' for assembly {assembly.FullName}: {ex.Message}");
+            TestAccountCore.Logger.LogError(
+                $"Failed to load asset bundle '{assetBundleName}' for assembly {assembly.FullName}: {ex.Message}");
         }
     }
 
@@ -45,15 +47,11 @@ public static class AssetLoader {
     }
 
 
-    public static void LoadItems(ConfigFile? configFile) {
-        LoadItemsAndReturn(configFile);
-    }
+    public static void LoadItems(ConfigFile? configFile) => LoadItemsAndReturn(configFile);
 
     // ReSharper disable once UnusedMethodReturnValue.Global
     public static List<ItemWithDefaultWeight> LoadItemsAndReturn(ConfigFile? configFile) {
-        if (_assets is null || configFile is null)
-            return [
-            ];
+        if (_assets is null || configFile is null) return [];
 
         var allAssets = _assets.LoadAllAssets<ItemWithDefaultWeight>();
 
@@ -67,15 +65,11 @@ public static class AssetLoader {
     }
 
 
-    public static void LoadHazards(ConfigFile? configFile) {
-        LoadHazardsAndReturn(configFile);
-    }
+    public static void LoadHazards(ConfigFile? configFile) => LoadHazardsAndReturn(configFile);
 
     // ReSharper disable once UnusedMethodReturnValue.Global
     public static List<MapHazardWithDefaultWeight> LoadHazardsAndReturn(ConfigFile? configFile) {
-        if (_assets is null || configFile is null)
-            return [
-            ];
+        if (_assets is null || configFile is null) return [];
 
         var allAssets = _assets.LoadAllAssets<MapHazardWithDefaultWeight>();
 
@@ -88,15 +82,11 @@ public static class AssetLoader {
         return hazardsWithDefaultWeight;
     }
 
-    public static void LoadUnlockables(ConfigFile? configFile) {
-        LoadUnlockablesAndReturn(configFile);
-    }
+    public static void LoadUnlockables(ConfigFile? configFile) => LoadUnlockablesAndReturn(configFile);
 
     // ReSharper disable once UnusedMethodReturnValue.Global
     public static List<UnlockableWithPrice> LoadUnlockablesAndReturn(ConfigFile? configFile) {
-        if (_assets is null || configFile is null)
-            return [
-            ];
+        if (_assets is null || configFile is null) return [];
 
         var allAssets = _assets.LoadAllAssets<UnlockableWithPrice>();
 
@@ -109,15 +99,11 @@ public static class AssetLoader {
         return unlockablesWithPrice;
     }
 
-    public static void LoadShopItems(ConfigFile? configFile) {
-        LoadShopItemsAndReturn(configFile);
-    }
+    public static void LoadShopItems(ConfigFile? configFile) => LoadShopItemsAndReturn(configFile);
 
     // ReSharper disable once UnusedMethodReturnValue.Global
     public static List<ShopItemWithDefaultPrice> LoadShopItemsAndReturn(ConfigFile? configFile) {
-        if (_assets is null || configFile is null)
-            return [
-            ];
+        if (_assets is null || configFile is null) return [];
 
         var allAssets = _assets.LoadAllAssets<ShopItemWithDefaultPrice>();
 
@@ -130,15 +116,11 @@ public static class AssetLoader {
         return itemsWithDefaultPrice;
     }
 
-    public static void LoadEnemies(ConfigFile? configFile) {
-        LoadEnemiesAndReturn(configFile);
-    }
+    public static void LoadEnemies(ConfigFile? configFile) => LoadEnemiesAndReturn(configFile);
 
     // ReSharper disable once UnusedMethodReturnValue.Global
     public static List<EnemyWithDefaultWeight> LoadEnemiesAndReturn(ConfigFile? configFile) {
-        if (_assets is null || configFile is null)
-            return [
-            ];
+        if (_assets is null || configFile is null) return [];
 
         var allAssets = _assets.LoadAllAssets<EnemyWithDefaultWeight>();
 
@@ -149,6 +131,22 @@ public static class AssetLoader {
         EnemyLoader.RegisterAllEnemies(enemiesWithWeight, configFile);
 
         return enemiesWithWeight;
+    }
+
+    public static void LoadHallwayHazards(ConfigFile? configFile) => LoadHallwayHazardsAndReturn(configFile);
+
+    public static List<HallwayHazardWithDefaultWeight> LoadHallwayHazardsAndReturn(ConfigFile? configFile) {
+        if (_assets is null || configFile is null) return [];
+
+        var allAssets = _assets.LoadAllAssets<HallwayHazardWithDefaultWeight>();
+
+        var allHazardsWithWeight = allAssets.OfType<HallwayHazardWithDefaultWeight>();
+
+        var hazardsWithWeight = allHazardsWithWeight.ToList();
+
+        HallwayHazardLoader.RegisterAllHazards(hazardsWithWeight, configFile);
+
+        return hazardsWithWeight;
     }
 
     public static void UnloadBundle(bool unloadAllLoadedObjects = false) => _assets?.Unload(unloadAllLoadedObjects);

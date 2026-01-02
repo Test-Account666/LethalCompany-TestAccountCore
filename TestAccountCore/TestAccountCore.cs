@@ -17,6 +17,7 @@ public class TestAccountCore : BaseUnityPlugin {
 
         harmony ??= new(MyPluginInfo.PLUGIN_GUID);
 
+        harmony.PatchAll(typeof(HallwayHazardRegistry));
         harmony.PatchAll(typeof(MapHazardRegistry));
         harmony.PatchAll(typeof(SpawnPeskyUnlockablesPatch));
 
