@@ -1,5 +1,9 @@
 # TestAccountCore
 
+## 1.15.1
+
+\* Fixed type load exceptions when LethalLib isn't installed<br>
+
 ## 1.15.0
 
 \+ Added hallway hazards loading<br>
