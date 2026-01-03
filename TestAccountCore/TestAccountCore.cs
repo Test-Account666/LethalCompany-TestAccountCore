@@ -1,3 +1,4 @@
+using System;
 using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
@@ -17,9 +18,11 @@ public class TestAccountCore : BaseUnityPlugin {
 
         harmony ??= new(MyPluginInfo.PLUGIN_GUID);
 
-        harmony.PatchAll(typeof(HallwayHazardRegistry));
-        harmony.PatchAll(typeof(MapHazardRegistry));
-        harmony.PatchAll(typeof(SpawnPeskyUnlockablesPatch));
+        if (DependencyChecker.IsLethalLibInstalled()) {
+            harmony.PatchAll(typeof(HallwayHazardRegistry));
+            harmony.PatchAll(typeof(MapHazardRegistry));
+            harmony.PatchAll(typeof(SpawnPeskyUnlockablesPatch));
+        }
 
         if (DependencyChecker.IsLobbyCompatibilityInstalled()) {
             Logger.LogInfo("Found LobbyCompatibility Mod, initializing support :)");
