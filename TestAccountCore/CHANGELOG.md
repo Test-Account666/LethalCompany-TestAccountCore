@@ -1,5 +1,11 @@
 # TestAccountCore
 
+## 1.16.0
+
+\* Fixed Netcode Patcher throwing type load exceptions<br>
+\# Switched from LethalLib to DawnLib<br>
+\# Improved Config Handling<br>
+
 ## 1.15.1
 
 \* Fixed type load exceptions when LethalLib isn't installed<br>
