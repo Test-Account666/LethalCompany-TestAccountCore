@@ -1,10 +1,7 @@
 using System;
 using System.Collections.Generic;
 using BepInEx.Configuration;
-using LethalLib.Extras;
-using LethalLib.Modules;
-using TestAccountCore.Patches;
-using UnityEngine;
+using Dawn;
 
 namespace TestAccountCore.Loaders;
 
@@ -17,37 +14,32 @@ public static class UnlockableLoader {
 
     private static void RegisterUnlockable(UnlockableWithPrice unlockable, ConfigFile? configFile) {
         if (configFile is null) return;
-
         if (unlockable.unlockableName is null) throw new NullReferenceException("Unlockable unlockableName cannot be null!");
-
         if (unlockable.spawnPrefab is null) throw new NullReferenceException($"({unlockable.unlockableName}) Spawn Prefab cannot be null!");
 
+        var section = $"{unlockable.unlockableName} - Unlockable";
 
-        var unlockableEnabled = configFile.Bind($"{unlockable.unlockableName}", "1. Enabled", true,
-                                                $"If false, {unlockable.unlockableName} will not be registered.");
+        var unlockableEnabled = configFile.Bind(section, "1. Enabled", true,
+            $"If false, {unlockable.unlockableName} will not be registered.");
 
         if (!unlockableEnabled.Value) return;
 
         TestAccountCore.Logger.LogInfo($"Registering unlockable {unlockable.unlockableName}...");
 
-        var alwaysUnlocked = configFile.Bind($"{unlockable.unlockableName}", "2. Always unlocked", false,
-                                             $"If true, {unlockable.unlockableName} will always be unlocked. Otherwise you need to unlock it.");
+        var alwaysUnlocked = configFile.Bind(section, "2. Always unlocked", false,
+            $"If true, {unlockable.unlockableName} will always be unlocked. Otherwise you need to unlock it.");
 
-        var price = configFile.Bind($"{unlockable.unlockableName}", "3. Price", unlockable.price,
-                                    new ConfigDescription($"Price to unlock {unlockable.unlockableName}. Obviously doesn't matter, if 'Always Unlocked' is true.",
-                                                          new AcceptableValueRange<int>(0, 100000)));
+        var price = configFile.Bind(section, "3. Price", unlockable.price,
+            new ConfigDescription($"Price to unlock {unlockable.unlockableName}. Obviously doesn't matter, if 'Always Unlocked' is true.",
+                new AcceptableValueRange<int>(0, 100000)));
 
-        if (ScriptableObject.CreateInstance(typeof(UnlockableItemDef)) is not UnlockableItemDef unlockableDef)
-            throw new NullReferenceException($"({unlockable.unlockableName}) Could not create unlockable item!");
-
-        unlockableDef.storeType = unlockable.storeType;
-
-        unlockableDef.unlockable = new() {
+        var unlockableItem = new UnlockableItem {
             unlockableName = unlockable.unlockableName,
+            alreadyUnlocked = alwaysUnlocked.Value,
             inStorage = false,
             alwaysInStock = true,
             canBeStored = true,
-            IsPlaceable = true,
+            IsPlaceable = false,
             maxNumber = 1,
             unlockableType = 1,
             spawnPrefab = true,
@@ -55,11 +47,15 @@ public static class UnlockableLoader {
             luckValue = unlockable.luckValue,
         };
 
-        if (alwaysUnlocked.Value) SpawnPeskyUnlockablesPatch.AlwaysUnlockedItems.Add(unlockableDef.unlockable);
+        var namespacedKey = NamespacedKey<DawnUnlockableItemInfo>.From("testaccountcore",
+            $"unlockable{unlockable.unlockableName.ToLower()}");
 
-        Unlockables.RegisterUnlockable(unlockableDef, price.Value, unlockable.storeType);
+        DawnLib.DefineUnlockable(namespacedKey, unlockableItem, unlockableBuilder => {
+            unlockableBuilder.SetCost(price.Value);
+            unlockableBuilder.DefinePlaceableObject(_ => {});
+        });
 
-        NetworkPrefabs.RegisterNetworkPrefab(unlockable.spawnPrefab);
+        DawnLib.RegisterNetworkPrefab(unlockable.spawnPrefab);
 
         unlockable.isRegistered = true;
 

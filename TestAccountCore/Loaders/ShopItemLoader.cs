@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using BepInEx.Configuration;
-using LethalLib.Modules;
+using Dawn;
 
 namespace TestAccountCore.Loaders;
 
@@ -14,28 +14,31 @@ public static class ShopItemLoader {
 
     private static void RegisterShopItem(ShopItemWithDefaultPrice item, ConfigFile? configFile) {
         if (configFile is null) return;
-
         if (item.item is null) throw new NullReferenceException("ItemProperties cannot be null!");
 
-        var canItemSpawn = configFile.Bind($"{item.item.itemName}", "1. Enabled", true,
-                                           $"If false, {item.item.itemName} will not be registered. This is different from a spawn weight of 0!");
+        var section = $"{item.item.itemName} - Shop";
+
+        var canItemSpawn = configFile.Bind(section, "1. Enabled", true,
+            $"If false, {item.item.itemName} will not be registered. This is different from a spawn weight of 0!");
 
         if (!canItemSpawn.Value) return;
 
         TestAccountCore.Logger.LogInfo($"Registering shop item {item.item.itemName}...");
 
-        var price = configFile.Bind($"{item.item.itemName}", "2. Price", item.defaultPrice, $"How much {item.item.itemName} costs to buy!");
+        var price = configFile.Bind(section, "2. Price", item.defaultPrice, $"How much {item.item.itemName} costs to buy!");
 
-        var itemConductivity = configFile.Bind($"{item.item.itemName}", "3. Is Conductive", item.item.isConductiveMetal,
-                                               "If set to true, will make the item conductive. Conductive defines, if the item attracts lightning");
+        var itemConductivity = configFile.Bind($"{item.item.itemName} - General", "1. Is Conductive", item.item.isConductiveMetal,
+            "If set to true, will make the item conductive. Conductive defines, if the item attracts lightning");
 
         item.item.isConductiveMetal = itemConductivity.Value;
 
-        foreach (var networkPrefab in item.connectedNetworkPrefabs) NetworkPrefabs.RegisterNetworkPrefab(networkPrefab);
+        var namespacedKey = NamespacedKey<DawnItemInfo>.From("testaccountcore", "shop" + item.item.itemName.ToLower());
 
-        NetworkPrefabs.RegisterNetworkPrefab(item.item.spawnPrefab);
+        DawnLib.DefineItem(namespacedKey, item.item,
+            itemBuilder => { itemBuilder.DefineShop(builder => { builder.OverrideCost(price.Value); }); });
 
-        Items.RegisterShopItem(item.item, price.Value);
+        DawnLib.RegisterNetworkPrefab(item.item.spawnPrefab);
+        item.connectedNetworkPrefabs.ForEach(DawnLib.RegisterNetworkPrefab);
 
         item.isRegistered = true;
 

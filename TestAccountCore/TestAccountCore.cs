@@ -3,11 +3,11 @@ using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
 using TestAccountCore.Dependencies;
-using TestAccountCore.Patches;
 
 namespace TestAccountCore;
 
 [BepInDependency("BMX.LobbyCompatibility", BepInDependency.DependencyFlags.SoftDependency)]
+[BepInDependency("com.github.teamxiaolan.dawnlib", BepInDependency.DependencyFlags.SoftDependency)]
 [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
 public class TestAccountCore : BaseUnityPlugin {
     internal static Harmony? harmony;
@@ -18,11 +18,7 @@ public class TestAccountCore : BaseUnityPlugin {
 
         harmony ??= new(MyPluginInfo.PLUGIN_GUID);
 
-        if (DependencyChecker.IsLethalLibInstalled()) {
-            harmony.PatchAll(typeof(HallwayHazardRegistry));
-            harmony.PatchAll(typeof(MapHazardRegistry));
-            harmony.PatchAll(typeof(SpawnPeskyUnlockablesPatch));
-        }
+        if (DependencyChecker.IsDawnLibInstalled()) harmony.PatchAll(typeof(HallwayHazardRegistry));
 
         if (DependencyChecker.IsLobbyCompatibilityInstalled()) {
             Logger.LogInfo("Found LobbyCompatibility Mod, initializing support :)");

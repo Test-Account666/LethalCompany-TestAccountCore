@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Dawn;
 using DunGen;
 using HarmonyLib;
 using LethalLib.Modules;
@@ -13,8 +14,7 @@ public static class HallwayHazardRegistry {
     private static readonly List<RegisteredHazard> _REGISTERED_HAZARDS = [
     ];
 
-    public static void RegisterHazard(HallwayHazardWithDefaultWeight hazard,
-        (Dictionary<Levels.LevelTypes, int> spawnRateByLevelType, Dictionary<string, int> spawnRateByCustomLevelType) spawnWeights) {
+    public static void RegisterHazard(HallwayHazardWithDefaultWeight hazard, Dictionary<string, int> spawnWeights) {
         _REGISTERED_HAZARDS.Add(new(hazard, spawnWeights));
     }
 
@@ -39,8 +39,9 @@ public static class HallwayHazardRegistry {
 
         toAdd.AddRange(
             from hazard in _REGISTERED_HAZARDS
+            let weight = hazard.GetWeight(RoundManager.Instance.currentLevel.PlanetName)
             from repeat in Enumerable.Repeat(new GameObjectWeight {
-                Weight = multiplier * GetSpawnWeight(hazard, RoundManager.Instance.currentLevel.PlanetName),
+                Weight = multiplier * weight,
                 GameObject = hazard.Hazard.spawnHazardPrefab,
             }, matchCount)
             select repeat
@@ -49,64 +50,34 @@ public static class HallwayHazardRegistry {
         connectors.AddRange(toAdd);
     }
 
-    private static int GetSpawnWeight(RegisteredHazard hazard, string levelType) {
-        var spawnWeight = GetVanillaWeight(hazard, levelType);
-
-        if (spawnWeight == -1 || !IsVanilla(levelType)) {
-            var moddedSpawnWeight = GetModdedWeight(hazard, levelType);
-            if (moddedSpawnWeight != -1) return moddedSpawnWeight;
-        }
-
-        if (spawnWeight != -1) return spawnWeight;
-
-        TestAccountCore.Logger.LogWarning($"Failed to find spawn weight for {hazard!.Hazard.hazardName}!");
-        return 0;
-    }
-
-    private static int GetModdedWeight(RegisteredHazard hazard, string levelType) {
-        var spawnWeight = -1;
-
-        var spawnWeights = hazard.SpawnWeights;
-
-        foreach (var (levelName, weight) in spawnWeights.spawnRateByCustomLevelType) {
-            if (!levelType.ToLower().Contains(levelName.ToLower())) continue;
-            spawnWeight = weight;
-            break;
-        }
-
-        return spawnWeight;
-    }
-
-    private static int GetVanillaWeight(RegisteredHazard hazard, string levelType) {
-        var spawnWeight = -1;
-
-        var spawnWeights = hazard.SpawnWeights;
-
-        foreach (var (levelTypes, weight) in spawnWeights.spawnRateByLevelType) {
-            switch (levelTypes) {
-                case Levels.LevelTypes.None: continue;
-                case Levels.LevelTypes.All when spawnWeight == -1:
-                case Levels.LevelTypes.Vanilla when spawnWeight == -1 && IsVanilla(levelType):
-                case Levels.LevelTypes.Modded when spawnWeight == -1 && !IsVanilla(levelType):
-                    spawnWeight = weight;
-                    continue;
-                default:
-                    if (!levelType.ToLower().Contains(levelTypes.ToString().ToLower())) continue;
-                    spawnWeight = weight;
-                    continue;
-            }
-        }
-
-        return spawnWeight;
-    }
-
-    private readonly struct RegisteredHazard(
-        HallwayHazardWithDefaultWeight hazard,
-        (Dictionary<Levels.LevelTypes, int> spawnRateByLevelType, Dictionary<string, int> spawnRateByCustomLevelType) spawnWeights) {
+    private readonly struct RegisteredHazard(HallwayHazardWithDefaultWeight hazard, Dictionary<string, int> spawnWeights) {
         public HallwayHazardWithDefaultWeight Hazard { get; } = hazard;
 
-        public (Dictionary<Levels.LevelTypes, int> spawnRateByLevelType, Dictionary<string, int> spawnRateByCustomLevelType) SpawnWeights {
-            get;
-        } = spawnWeights;
+        public Dictionary<string, int> SpawnWeights { get; } = spawnWeights;
+
+        public int GetWeight(string level) {
+            var randomKey = NamespacedKey.ForceParse(level, true);
+            if (randomKey is not NamespacedKey<DawnMoonInfo> moonKey) {
+                TestAccountCore.Logger.LogWarning($"(Hazard: {Hazard.hazardName}) Couldn't find weight for key {randomKey}! Is it a moon?");
+                return -1;
+            }
+
+            var found = -1;
+
+            foreach (var (key, weight) in SpawnWeights) {
+                if (level.ToLower().Contains(key)) return weight;
+                switch (key) {
+                    case "all":
+                    case "modded" when moonKey.IsModded():
+                    case "vanilla" when moonKey.IsVanilla():
+                        found = weight;
+                        continue;
+                }
+            }
+
+            if (found != -1) return found;
+            TestAccountCore.Logger.LogWarning($"(Hazard: {Hazard.hazardName}) Couldn't find weight for key {moonKey}!");
+            return 0;
+        }
     }
 }

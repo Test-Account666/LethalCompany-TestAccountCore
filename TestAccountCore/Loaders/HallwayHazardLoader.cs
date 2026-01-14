@@ -1,5 +1,8 @@
 using System.Collections.Generic;
+using System.Reflection;
 using BepInEx.Configuration;
+using Dawn;
+using HarmonyLib;
 using LethalLib.Modules;
 
 namespace TestAccountCore.Loaders;
@@ -29,22 +32,21 @@ public static class HallwayHazardLoader {
             return;
         }
 
-        var canHazardSpawn = configFile.Bind($"{hazard.hazardName}", "1. Enabled", true,
+        var section = $"{hazard.hazardName} - Hallway Hazard";
+
+        var canHazardSpawn = configFile.Bind(section, "1. Enabled", true,
             $"If false, {hazard.hazardName} will not be registered. This is different from a spawn weight of 0!");
 
         if (!canHazardSpawn.Value) return;
 
         TestAccountCore.Logger.LogInfo($"Registering hallway hazard {hazard.hazardName}...");
 
-        var configMoonRarity = configFile.Bind($"{hazard.hazardName}", "2. Moon Spawn Weight",
+        var configMoonRarity = configFile.Bind(section, "2. Moon Spawn Weight",
             $"Vanilla:{hazard.defaultWeight}, Modded:{hazard.defaultWeight}",
             $"Defines the spawn weight per moon. e.g. Assurance:{hazard.defaultWeight}");
 
         var parsedConfig = configMoonRarity.Value.ParseConfig(hazard.hazardName);
-
-        foreach (var networkPrefab in hazard.connectedNetworkPrefabs) NetworkPrefabs.RegisterNetworkPrefab(networkPrefab);
-
-        NetworkPrefabs.RegisterNetworkPrefab(hazard.hazardPrefab);
+        DawnLib.RegisterNetworkPrefab(hazard.hazardPrefab);
 
         HallwayHazardRegistry.RegisterHazard(hazard, parsedConfig);
         hazard.isRegistered = true;

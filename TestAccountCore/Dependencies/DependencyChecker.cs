@@ -9,4 +9,7 @@ public static class DependencyChecker {
 
     public static bool IsLethalLibInstalled() =>
         Chainloader.PluginInfos.Values.Any(metadata => metadata.Metadata.GUID.ToLowerInvariant().Contains("lethallib"));
+
+    public static bool IsDawnLibInstalled() =>
+        Chainloader.PluginInfos.Values.Any(metadata => metadata.Metadata.GUID.ToLowerInvariant().Contains("dawnlib"));
 }

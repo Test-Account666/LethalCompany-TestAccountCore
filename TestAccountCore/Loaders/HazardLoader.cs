@@ -4,7 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
 using BepInEx.Configuration;
-using LethalLib.Modules;
+using Dawn;
 using MonoMod.Utils;
 using UnityEngine;
 
@@ -21,13 +21,12 @@ public static class HazardLoader {
 
     private static void RegisterHazard(MapHazardWithDefaultWeight hazard, ConfigFile? configFile) {
         if (configFile is null) return;
-
         if (hazard.hazardName is null) throw new NullReferenceException("Map Hazard name cannot be null!");
-
         if (hazard.spawnableMapObject is null) throw new NullReferenceException($"({hazard.hazardName}) Map Hazard cannot be null!");
 
+        var section = $"{hazard.hazardName} - Hazard";
 
-        var canHazardSpawn = configFile.Bind($"{hazard.hazardName}", "1. Enabled", true, $"If false, {hazard.hazardName} will not be registered.");
+        var canHazardSpawn = configFile.Bind(section, "1. Enabled", true, $"If false, {hazard.hazardName} will not be registered.");
 
         if (!canHazardSpawn.Value) return;
 
@@ -40,13 +39,16 @@ public static class HazardLoader {
 
         var defaultCurve = $"Vanilla - {hazard.spawnCurve} ; Modded - {hazard.spawnCurve}";
 
-        var spawnCurveString = configFile.Bind($"{hazard.hazardName}", "2. Spawn Curve", defaultCurve,
-                                               $"The spawn curve for {hazard.hazardName}. "
-                                             + $"First number is between 0 and 1. The second one is the max amount.").Value;
+        var spawnCurveString = configFile.Bind(section, "2. Spawn Curve", defaultCurve,
+            $"The spawn curve for {hazard.hazardName}. "
+            + $"First number is between 0 and 1. The second one is the max amount.").Value;
+
+        spawnCurveString = spawnCurveString.ToUpper();
 
         if (!spawnCurveString.Contains("-")) {
-            TestAccountCore.Logger.LogWarning($"Looks like you didn't specify any moons for {hazard.hazardName}! Defaulting to 'All'! A valid example: '{
-                defaultCurve}'");
+            TestAccountCore.Logger.LogWarning(
+                $"Looks like you didn't specify any moons for {hazard.hazardName}! Defaulting to 'All'! A valid example: '{
+                    defaultCurve}'");
             spawnCurveString = $"All - {spawnCurveString}";
         }
 
@@ -61,53 +63,52 @@ public static class HazardLoader {
             return;
         }
 
-        var noSpawnAnimationCurve = new AnimationCurve(new(0, 0), new(1, 0));
+        var namespacedKey = NamespacedKey<DawnMapObjectInfo>.From("testaccountcore", "hazard" + hazard.hazardName.ToLower());
 
-        var hasAll = levelSpawnCurveDictionary.TryGetValue("ALL", out var allLevelSpawnCurve);
-        var hasVanilla = levelSpawnCurveDictionary.TryGetValue("VANILLA", out var vanillaLevelSpawnCurve);
-        var hasModded = levelSpawnCurveDictionary.TryGetValue("MODDED", out var moddedLevelSpawnCurve);
+        DawnLib.DefineMapObject(namespacedKey, hazard.spawnableMapObject!,
+            infoBuilder => {
+                infoBuilder.DefineInside(insideBuilder => {
+                    insideBuilder.OverrideDisallowSpawningNearEntrances(hazard.disallowSpawningNearEntrances);
+                    insideBuilder.OverrideRequireDistanceBetweenSpawns(hazard.requireDistanceBetweenSpawns);
+                    insideBuilder.OverrideSpawnFacingAwayFromWall(hazard.spawnFacingAwayFromWall);
+                    insideBuilder.OverrideSpawnFacingWall(hazard.spawnFacingWall);
+                    insideBuilder.OverrideSpawnWithBackFlushAgainstWall(hazard.spawnWithBackFlushAgainstWall);
+                    insideBuilder.OverrideSpawnWithBackToWall(hazard.spawnWithBackToWall);
 
-        MapHazardRegistry.RegisteredHazards[new() {
-            prefabToSpawn = hazard.spawnableMapObject,
-            spawnFacingWall = hazard.spawnFacingWall,
-            spawnWithBackToWall = hazard.spawnWithBackToWall,
-            spawnFacingAwayFromWall = hazard.spawnFacingAwayFromWall,
-            spawnWithBackFlushAgainstWall = hazard.spawnWithBackFlushAgainstWall,
-            disallowSpawningNearEntrances = hazard.disallowSpawningNearEntrances,
-            requireDistanceBetweenSpawns = hazard.requireDistanceBetweenSpawns,
-        }] = level => {
-            var levelName = _NumberPattern.Value.Replace(level.PlanetName, "").ToLower();
+                    insideBuilder.SetWeights(curveBuilder => {
+                        foreach (var (moon, weight) in levelSpawnCurveDictionary) {
+                            if (moon is null) continue;
+                            if (moon.Equals("ALL")) {
+                                curveBuilder.SetGlobalCurve(weight);
+                                continue;
+                            }
 
-            var spawnCurve = noSpawnAnimationCurve;
+                            var foundKey = NamespacedKey.ForceParse(moon, true);
+                            if (foundKey == null!) {
+                                TestAccountCore.Logger.LogError($"Could not parse key {moon} for hazard {hazard.hazardName}");
+                                continue;
+                            }
 
-            if (hasAll) spawnCurve = allLevelSpawnCurve;
+                            if (foundKey is not NamespacedKey<DawnMoonInfo> moonKey) {
+                                curveBuilder.AddTagCurve(foundKey, weight);
+                                continue;
+                            }
 
-            var isVanilla = VanillaLevelMatcher.IsVanilla(levelName);
+                            curveBuilder.AddCurve(moonKey, weight);
+                        }
+                    });
+                });
+            });
 
-            if (hasVanilla && isVanilla) spawnCurve = vanillaLevelSpawnCurve;
-
-            if (hasModded && !isVanilla) spawnCurve = moddedLevelSpawnCurve;
-
-            foreach (var (spawnLevel, animationCurve) in levelSpawnCurveDictionary) {
-                if (!levelName.StartsWith(spawnLevel.ToLower())) continue;
-
-                spawnCurve = animationCurve;
-                break;
-            }
-
-            spawnCurve ??= noSpawnAnimationCurve;
-
-            return spawnCurve;
-        };
-
-        NetworkPrefabs.RegisterNetworkPrefab(hazard.spawnableMapObject);
+        DawnLib.RegisterNetworkPrefab(hazard.spawnableMapObject);
 
         hazard.isRegistered = true;
 
         TestAccountCore.Logger.LogInfo($"Fully registered hazard {hazard.hazardName}!");
     }
 
-    private static bool FillLevelSpawnCurveList(string defaultCurve, string spawnCurveString, Dictionary<string, AnimationCurve> levelSpawnCurveDictionary) {
+    private static bool FillLevelSpawnCurveList(string defaultCurve, string spawnCurveString,
+        Dictionary<string, AnimationCurve> levelSpawnCurveDictionary) {
         var levelSpawnSplit = spawnCurveString.Split(";", StringSplitOptions.RemoveEmptyEntries);
 
         if (levelSpawnSplit.Length < 1)
@@ -148,7 +149,7 @@ public static class HazardLoader {
                 LevelTypes.ALL => "ALL",
                 LevelTypes.VANILLA => "VANILLA",
                 LevelTypes.MODDED => "MODDED",
-                var _ => levelName,
+                _ => levelName,
             };
 
             var animationCurve = new AnimationCurve(keyFrames.ToArray());
@@ -178,7 +179,7 @@ public static class HazardLoader {
             if (!parsedTime) {
                 try {
                     throw new InvalidDataException($"'{spawnCurveString}' is invalid!"
-                                                 + $" Point: {keyframeString} (Could not parse time '{keyframe[0]}' as float)");
+                                                   + $" Point: {keyframeString} (Could not parse time '{keyframe[0]}' as float)");
                 } catch (Exception exception) {
                     TestAccountCore.Logger.LogError($"Map Hazard spawn curve is not correctly configured: {exception.Message}");
 
@@ -192,7 +193,7 @@ public static class HazardLoader {
             if (!parsedAmount) {
                 try {
                     throw new InvalidDataException($"'{spawnCurveString}' is invalid!"
-                                                 + $" Point: {keyframeString} (Could not parse amount '{keyframe[1]}' as int)");
+                                                   + $" Point: {keyframeString} (Could not parse amount '{keyframe[1]}' as int)");
                 } catch (Exception exception) {
                     TestAccountCore.Logger.LogError($"Map Hazard spawn curve is not correctly configured: {exception.Message}");
 

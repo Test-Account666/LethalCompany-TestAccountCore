@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using BepInEx.Configuration;
-using LethalLib.Modules;
+using Dawn;
 
 namespace TestAccountCore.Loaders;
 
@@ -14,30 +14,63 @@ public static class EnemyLoader {
 
     private static void RegisterEnemy(EnemyWithDefaultWeight enemy, ConfigFile? configFile) {
         if (configFile is null) return;
-
         if (enemy.enemyType is null) throw new NullReferenceException("EnemyType cannot be null!");
 
-        var canItemSpawn = configFile.Bind($"{enemy.enemyType.enemyName}", "1. Enabled", true,
-                                           $"If false, {enemy.enemyType.enemyName} will not be registered. This is different from a spawn weight of 0!");
+        var enemyName = enemy.enemyType.enemyName;
+        var section = $"{enemyName} - Enemy";
+
+        var canItemSpawn = configFile.Bind(section, "1. Enabled", true,
+            $"If false, {enemyName} will not be registered. This is different from a spawn weight of 0!");
 
         if (!canItemSpawn.Value) return;
 
-        TestAccountCore.Logger.LogInfo($"Registering enemy {enemy.enemyType.enemyName}...");
+        TestAccountCore.Logger.LogInfo($"Registering enemy {enemyName}...");
 
-        var configMoonRarity = configFile.Bind($"{enemy.enemyType.enemyName}", "2. Moon Spawn Weight",
-                                               $"Vanilla:{enemy.defaultWeight}, Modded:{enemy.defaultWeight}",
-                                               $"Defines the spawn weight per moon. e.g. Assurance:{enemy.defaultWeight}");
+        var configMoonRarity = configFile.Bind(section, "2. Moon Spawn Weight",
+            $"Vanilla:{enemy.defaultWeight}, Modded:{enemy.defaultWeight}",
+            $"Defines the spawn weight per moon. e.g. Assurance:{enemy.defaultWeight}");
 
-        var parsedConfig = configMoonRarity.Value.ParseConfig(enemy.enemyType.enemyName);
+        var spawnRateByCustomLevelType = configMoonRarity.Value.ParseConfig(enemyName);
 
-        foreach (var networkPrefab in enemy.connectedNetworkPrefabs) NetworkPrefabs.RegisterNetworkPrefab(networkPrefab);
+        var namespacedKey = NamespacedKey<DawnEnemyInfo>.From("testaccountcore", "enemy" + enemyName.ToLower());
 
-        NetworkPrefabs.RegisterNetworkPrefab(enemy.enemyType.enemyPrefab);
+        DawnLib.DefineEnemy(namespacedKey, enemy.enemyType, enemyBuilder => {
+            enemyBuilder.CreateBestiaryNode(enemy.infoNode.displayText).CreateNameKeyword(enemy.keyWord.word);
+            enemyBuilder.DefineInside(insideBuilder => { insideBuilder.SetWeights(SetWeights); });
+        });
 
-        Enemies.RegisterEnemy(enemy.enemyType, parsedConfig.spawnRateByLevelType, parsedConfig.spawnRateByCustomLevelType, enemy.infoNode, enemy.keyWord);
+        DawnLib.RegisterNetworkPrefab(enemy.enemyType.enemyPrefab);
+        enemy.connectedNetworkPrefabs.ForEach(DawnLib.RegisterNetworkPrefab);
 
         enemy.isRegistered = true;
 
-        TestAccountCore.Logger.LogInfo($"Fully registered enemy {enemy.enemyType.enemyName}!");
+        TestAccountCore.Logger.LogInfo($"Fully registered enemy {enemyName}!");
+        return;
+
+        void SetWeights(WeightTableBuilder<DawnMoonInfo> weightBuilder) {
+            foreach (var (moon, weight) in spawnRateByCustomLevelType) {
+                if (moon is null) continue;
+
+                if (moon.Equals("all")) {
+                    weightBuilder.SetGlobalWeight(weight);
+                    continue;
+                }
+
+                var foundKey = NamespacedKey.ForceParse(moon, true);
+                if (foundKey == null!) {
+                    TestAccountCore.Logger.LogError($"Could not parse key {moon} for enemy {enemyName}");
+                    continue;
+                }
+
+                if (foundKey is not NamespacedKey<DawnMoonInfo> moonKey) {
+                    weightBuilder.AddTagWeight(foundKey, weight);
+                    continue;
+                }
+
+                weightBuilder.AddWeight(moonKey, weight);
+            }
+
+            weightBuilder.Build();
+        }
     }
 }
