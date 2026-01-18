@@ -1,5 +1,9 @@
 # TestAccountCore
 
+## 1.16.1
+
+\* Fixed weird interactions with unlockables<br>
+
 ## 1.16.0
 
 \* Fixed Netcode Patcher throwing type load exceptions<br>
