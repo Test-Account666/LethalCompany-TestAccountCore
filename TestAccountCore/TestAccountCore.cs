@@ -17,7 +17,10 @@ public class TestAccountCore : BaseUnityPlugin {
 
         harmony ??= new(MyPluginInfo.PLUGIN_GUID);
 
-        if (DependencyChecker.IsDawnLibInstalled()) harmony.PatchAll(typeof(HallwayHazardRegistry));
+        if (DependencyChecker.IsDawnLibInstalled()) {
+            harmony.PatchAll(typeof(HallwayHazardRegistry));
+            harmony.PatchAll(typeof(SpawnTheUnlockablesGodDammit));
+        }
 
         if (DependencyChecker.IsLobbyCompatibilityInstalled()) {
             Logger.LogInfo("Found LobbyCompatibility Mod, initializing support :)");

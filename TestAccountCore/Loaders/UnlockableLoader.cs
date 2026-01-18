@@ -35,11 +35,11 @@ public static class UnlockableLoader {
 
         var unlockableItem = new UnlockableItem {
             unlockableName = unlockable.unlockableName,
-            alreadyUnlocked = alwaysUnlocked.Value,
+            alreadyUnlocked = false,
             inStorage = false,
             alwaysInStock = true,
             canBeStored = true,
-            IsPlaceable = false,
+            IsPlaceable = true,
             maxNumber = 1,
             unlockableType = 1,
             spawnPrefab = true,
@@ -54,11 +54,11 @@ public static class UnlockableLoader {
             unlockableBuilder.SetCost(price.Value);
             unlockableBuilder.DefinePlaceableObject(_ => {});
         });
-
         DawnLib.RegisterNetworkPrefab(unlockable.spawnPrefab);
 
-        unlockable.isRegistered = true;
+        if (alwaysUnlocked.Value) SpawnTheUnlockablesGodDammit.AllUnlockedItems.Add(unlockableItem);
 
+        unlockable.isRegistered = true;
         TestAccountCore.Logger.LogInfo($"Fully registered unlockable {unlockable.unlockableName}!");
     }
 }
