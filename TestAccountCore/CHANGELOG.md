@@ -1,5 +1,11 @@
 # TestAccountCore
 
+## 1.16.2
+
+\* Fixed `modded:` not being counted as `custom:`<br>
+\* Fixed `always unlocked` unlockables still being buyable<br>
+\* Fixed some last LethalLib remains<br>
+
 ## 1.16.1
 
 \* Fixed weird interactions with unlockables<br>
