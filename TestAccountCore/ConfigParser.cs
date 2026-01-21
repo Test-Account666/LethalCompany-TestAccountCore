@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using LethalLib.Modules;
 
 namespace TestAccountCore;
 
@@ -9,7 +7,7 @@ public static class ConfigParser {
     public static Dictionary<string, int> ParseConfig(this string configMoonRarity, string itemName) {
         Dictionary<string, int> spawnRateByCustomLevelType = [
         ];
-        configMoonRarity = configMoonRarity.ToLower();
+        configMoonRarity = configMoonRarity.ToLower().Replace("modded:", "custom:");
 
         foreach (var entry in configMoonRarity.Split(',').Select(configEntry => configEntry.Trim())) {
             if (string.IsNullOrWhiteSpace(entry)) continue;

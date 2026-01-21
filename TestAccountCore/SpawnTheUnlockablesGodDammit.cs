@@ -25,6 +25,7 @@ public static class SpawnTheUnlockablesGodDammit {
             if (StartOfRound.Instance.SpawnedShipUnlockables.ContainsKey(index)) continue;
 
             StartOfRound.Instance.SpawnUnlockable(index, false);
+            iHateThisUnlockable.hasBeenUnlockedByPlayer = true;
         }
     }
 }

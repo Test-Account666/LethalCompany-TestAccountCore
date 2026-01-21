@@ -43,7 +43,7 @@ public static class HazardLoader {
             $"The spawn curve for {hazard.hazardName}. "
             + $"First number is between 0 and 1. The second one is the max amount.").Value;
 
-        spawnCurveString = spawnCurveString.ToUpper();
+        spawnCurveString = spawnCurveString.ToUpper().Replace("MODDED:", "CUSTOM:");
 
         if (!spawnCurveString.Contains("-")) {
             TestAccountCore.Logger.LogWarning(
@@ -148,7 +148,7 @@ public static class HazardLoader {
             levelName = levelType switch {
                 LevelTypes.ALL => "ALL",
                 LevelTypes.VANILLA => "VANILLA",
-                LevelTypes.MODDED => "MODDED",
+                LevelTypes.MODDED => "CUSTOM",
                 _ => levelName,
             };
 

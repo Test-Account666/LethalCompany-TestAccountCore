@@ -3,8 +3,6 @@ using System.Linq;
 using Dawn;
 using DunGen;
 using HarmonyLib;
-using LethalLib.Modules;
-using static TestAccountCore.VanillaLevelMatcher;
 using Dungeon = DunGen.Dungeon;
 
 namespace TestAccountCore;
