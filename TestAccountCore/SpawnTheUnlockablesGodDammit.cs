@@ -16,15 +16,18 @@ public static class SpawnTheUnlockablesGodDammit {
     public static void RespawnTheGodDamnUnlockables() => DoYourWorst();
 
     private static void DoYourWorst() {
-        var dontYouDareExplodeList = StartOfRound.Instance.unlockablesList.unlockables;
+        var instance = StartOfRound.Instance;
+        if (!instance || (!instance.IsHost && !instance.IsServer)) return;
+
+        var dontYouDareExplodeList = instance.unlockablesList.unlockables;
 
         for (var index = 0; index < dontYouDareExplodeList.Count; index++) {
             var iHateThisUnlockable = dontYouDareExplodeList[index];
             if (!AllUnlockedItems.Contains(iHateThisUnlockable)) continue;
             if (iHateThisUnlockable.hasBeenUnlockedByPlayer || iHateThisUnlockable.alreadyUnlocked) continue;
-            if (StartOfRound.Instance.SpawnedShipUnlockables.ContainsKey(index)) continue;
+            if (instance.SpawnedShipUnlockables.ContainsKey(index)) continue;
 
-            StartOfRound.Instance.SpawnUnlockable(index, false);
+            instance.SpawnUnlockable(index, false);
             iHateThisUnlockable.hasBeenUnlockedByPlayer = true;
         }
     }
