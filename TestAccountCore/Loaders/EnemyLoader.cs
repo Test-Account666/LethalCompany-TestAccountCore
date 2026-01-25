@@ -47,7 +47,7 @@ public static class EnemyLoader {
         TestAccountCore.Logger.LogInfo($"Fully registered enemy {enemyName}!");
         return;
 
-        void SetWeights(WeightTableBuilder<DawnMoonInfo> weightBuilder) {
+        void SetWeights(WeightTableBuilder<DawnMoonInfo, SpawnWeightContext> weightBuilder) {
             foreach (var (moon, weight) in spawnRateByCustomLevelType) {
                 if (moon is null) continue;
 

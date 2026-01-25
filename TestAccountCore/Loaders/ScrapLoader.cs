@@ -66,7 +66,7 @@ public static class ScrapLoader {
         TestAccountCore.Logger.LogInfo($"Fully registered item {itemName}!");
         return;
 
-        void SetWeights(WeightTableBuilder<DawnMoonInfo> weightBuilder) {
+        void SetWeights(WeightTableBuilder<DawnMoonInfo, SpawnWeightContext> weightBuilder) {
             foreach (var (moon, weight) in spawnRateByCustomLevelType) {
                 if (moon is null) continue;
 
