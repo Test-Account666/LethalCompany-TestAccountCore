@@ -1,5 +1,9 @@
 # TestAccountCore
 
+## 1.16.4
+
+\* Fixed DawnLib compatibility<br>
+
 ## 1.16.3
 
 \* Fixed `NotServerException` with Unlockables oooops<br>
