@@ -29,4 +29,11 @@ public class TestAccountCore : BaseUnityPlugin {
 
         Logger.LogInfo($"{MyPluginInfo.PLUGIN_GUID} v{MyPluginInfo.PLUGIN_VERSION} has loaded!");
     }
+
+    /*TODO:
+       List<NamespacedConfigWeight> Moons = NamespacedConfigWeight.ConvertManyFromString(Config.MoonSpawnWeights.Value);
+       List<NamespacedConfigWeight> Interiors = NamespacedConfigWeight.ConvertManyFromString(Config.InteriorSpawnWeights.Value);
+       List<NamespacedConfigWeight> Weathers = NamespacedConfigWeight.ConvertManyFromString(Config.WeatherSpawnWeights.Value);
+       SpawnWeights.SetupSpawnWeightsPreset(Moons, Interiors, Weathers);
+     */
 }

@@ -1,5 +1,13 @@
 # TestAccountCore
 
+## 1.16.6
+
+\* Fixed DawnLib compatibility.<br>
+
+## 1.16.5
+
+\* Fixed Hallway Hazards not spawning on modded when using `modded:` or `custom:` tags<br>
+
 ## 1.16.4
 
 \* Fixed DawnLib compatibility<br>

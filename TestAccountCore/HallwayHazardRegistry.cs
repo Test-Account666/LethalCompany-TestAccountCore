@@ -66,6 +66,7 @@ public static class HallwayHazardRegistry {
                 if (level.ToLower().Contains(key)) return weight;
                 switch (key) {
                     case "all":
+                    case "custom" when moonKey.IsModded():
                     case "modded" when moonKey.IsModded():
                     case "vanilla" when moonKey.IsVanilla():
                         found = weight;
